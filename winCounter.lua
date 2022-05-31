@@ -7,9 +7,11 @@ step_number  = 0
 now_count    = 0
 log_path     = ""
 username     = ""
+can_check_wins = false
 
 last_text    = ""
 activated    = false
+TRIGGER = '▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬'
 
 hotkey_reset_id = obs.OBS_INVALID_HOTKEY_ID
 hotkey_up_id    = obs.OBS_INVALID_HOTKEY_ID
@@ -194,7 +196,7 @@ function script_defaults(settings)
     obs.obs_data_set_default_int(settings, "start_number", 0)
     obs.obs_data_set_default_int(settings, "step_number", 1)
     obs.obs_data_set_default_string(settings, "format_text", "Wins: %d")
-    obs.obs_data_set_default_string(settings, "username", "Notch")
+    obs.obs_data_set_default_string(settings, "username", "Matooki1")
     obs.obs_data_set_default_string(settings, "log_path", ".minecraft\\logs\\latest.log")
 end
 
@@ -319,23 +321,42 @@ end
 end
 
 function checkForWin(line, time)
-    --check if the line contains the username
-    if string.find(line, "1st") then
-        firstDetected = true
-        print("FOUND A FIRST")
-    elseif firstDetected then
-        if string.find(line, username) and timeOfLatestWin ~= time then
-            print("LESSGOOOOOO")
-            numberOfWins = numberOfWins + 1
-            firstDetected = false
-            updateWinCounter(numberOfWins)
-            timeOfLatestWin = time
-        else
-            firstDetected = false
+
+    if string.find(line, TRIGGER) then
+        local count = string.find(line, TRIGGER)
+        for i = 1, count do
+            toggleWins()
+        end
+    end
+
+    if can_check_wins then
+        --check if the line contains the username
+        if string.find(line, "1st") then
+            firstDetected = true
+            print("FOUND A FIRST")
+        elseif firstDetected then
+            if string.find(line, username) and timeOfLatestWin ~= time then
+                print("LESSGOOOOOO")
+                numberOfWins = numberOfWins + 1
+                firstDetected = false
+                updateWinCounter(numberOfWins)
+                timeOfLatestWin = time
+            else
+                firstDetected = false
+            end
         end
     end
 end
 
+function toggleWins()
+    if can_check_wins then
+        can_check_wins = false
+    else
+        can_check_wins = true
+    end
+end
+
+-- function called when a new win is detected
 function updateWinCounter(numberOfWins)
     count_up(true)
 end
