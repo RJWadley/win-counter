@@ -195,7 +195,7 @@ function script_defaults(settings)
     obs.obs_data_set_default_int(settings, "step_number", 1)
     obs.obs_data_set_default_string(settings, "format_text", "Wins: %d")
     obs.obs_data_set_default_string(settings, "username", "Notch")
-    obs.obs_data_set_default_string(settings, "log_path", "%APPDATA%/.minecraft/logs/latest.log")
+    obs.obs_data_set_default_string(settings, "log_path", ".minecraft/logs/latest.log")
 end
 
 -- A function named script_save will be called when the script is saved
@@ -266,8 +266,12 @@ function parseLog()
     --open the log file
     local file = io.open(log_path, "r")
     if file == nil then
-        print("Could not open log file")
-        return
+        appdata = os.getenv("APPDATA")
+        file = io.open(appdata .. "/" .. log_path, "r")
+        if file == nil then
+            print("Could not open log file")
+            return
+        end
     end
 
     --read the file
